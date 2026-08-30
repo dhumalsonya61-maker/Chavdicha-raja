@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>चावडीचा राजा | भैरवनाथ गणेशोत्सव मंडळ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Noto Sans Devanagari",sans-serif;background:#fff7e8;color:#5b160d}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:22px 14px;
+background:radial-gradient(circle at top,#fffdf5 0,#ffe5ad 48%,#b71c1c 150%);}
+.card{width:min(520px,100%);background:rgba(255,250,238,.96);border:3px solid #9e1b12;border-radius:26px;
+box-shadow:0 18px 60px rgba(75,10,0,.28);overflow:hidden;text-align:center}
+.top{padding:24px 18px 10px}
+.badge{display:inline-block;background:#9e1b12;color:#ffe9a8;padding:7px 18px;border-radius:30px;font-weight:700;font-size:14px}
+h1{margin:14px 0 3px;font-size:40px;line-height:1.15;color:#a5160d;text-shadow:0 2px #f6d88a}
+h2{margin:0 0 6px;font-size:22px;color:#6e180f}
+.est{font-size:15px;font-weight:700;color:#9e1b12}
+.photo{width:100%;display:block;aspect-ratio:1/1;object-fit:cover}
+.content{padding:20px}
+.intro{font-size:18px;font-weight:700;margin:0 0 18px}
+.info{display:grid;gap:10px;text-align:left}
+.row{background:#fff3d4;border:1px solid #e8bb62;border-radius:15px;padding:12px 14px;font-size:16px}
+.row b{color:#94180f}
+.buttons{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+button,.share{border:0;border-radius:14px;padding:13px 10px;font:inherit;font-weight:700;cursor:pointer;text-decoration:none}
+.music{background:#9e1b12;color:#fff}
+.share{background:#e8ae27;color:#541008}
+.footer{padding:16px;font-size:13px;color:#7c4037}
+.petals{font-size:24px;letter-spacing:7px}
+@media(max-width:380px){h1{font-size:32px}.buttons{grid-template-columns:1fr}.row{font-size:15px}}
+</style>
+</head>
+<body>
+<section class="hero">
+  <div class="card">
+    <div class="top">
+      <div class="petals">🌺 🪔 🌺</div>
+      <span class="badge">श्री गणेशाय नमः</span>
+      <h1>चावडीचा राजा</h1>
+      <h2>भैरवनाथ गणेशोत्सव मंडळ, सोनके</h2>
+      <div class="est">स्थापना – १९६५</div>
+    </div>
+
+    <img class="photo" src="ganpati.jpg" alt="चावडीचा राजा - भैरवनाथ गणेशोत्सव मंडळ">
+
+    <div class="content">
+      <p class="intro">🙏 गणपती बाप्पा मोरया! 🙏</p>
+
+      <div class="info">
+        <div class="row">👥 <b>आयोजक:</b> भैरवनाथ ग्रुप</div>
+        <div class="row">📅 <b>गणपती स्थापना:</b> १४ सप्टेंबर २०२६</div>
+        <div class="row">⏰ <b>स्थापनेची वेळ:</b> सायंकाळी ४:३० वाजता</div>
+        <div class="row">📅 <b>गणपती विसर्जन:</b> २५ सप्टेंबर २०२६</div>
+        <div class="row">📍 <b>स्थळ:</b> भैरवनाथ मंदिर, सोनके</div>
+        <div class="row">📞 <b>संपर्क:</b> 0000055555</div>
+      </div>
+
+      <div class="buttons">
+        <button class="music" id="musicBtn" onclick="toggleMusic()">🎵 संगीत सुरू करा</button>
+        <a class="share" href="#" onclick="sharePage(event)">📲 निमंत्रण शेअर करा</a>
+      </div>
+    </div>
+
+    <div class="footer">🌼 आपली उपस्थिती हीच आमच्यासाठी आनंदाची गोष्ट 🌼<br>गणपती बाप्पा मोरया! 🚩</div>
+  </div>
+</section>
+
+<script>
+let ctx, master, timer, playing=false;
+const notes=[261.63,329.63,392,329.63,293.66,349.23,440,349.23];
+function playNote(freq,t){
+  const o=ctx.createOscillator(), g=ctx.createGain();
+  o.type="sine"; o.frequency.value=freq;
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.045,t+.04);
+  g.gain.exponentialRampToValueAtTime(.001,t+.65);
+  o.connect(g).connect(master); o.start(t); o.stop(t+.7);
+}
+function loop(){
+  if(!playing)return;
+  const now=ctx.currentTime;
+  notes.forEach((n,i)=>playNote(n,now+i*.42));
+  timer=setTimeout(loop, notes.length*420);
+}
+function toggleMusic(){
+  const b=document.getElementById("musicBtn");
+  if(!playing){
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    master=ctx.createGain(); master.gain.value=.8; master.connect(ctx.destination);
+    playing=true; b.textContent="🔇 संगीत बंद करा"; loop();
+  }else{
+    playing=false; clearTimeout(timer); if(ctx)ctx.close();
+    b.textContent="🎵 संगीत सुरू करा";
+  }
+}
+async function sharePage(e){
+  e.preventDefault();
+  const data={title:"चावडीचा राजा",text:"चावडीचा राजा – भैरवनाथ गणेशोत्सव मंडळ, सोनके. गणपती बाप्पा मोरया! 🚩",url:location.href};
+  if(navigator.share){try{await navigator.share(data)}catch(_){}}
+  else{await navigator.clipboard.writeText(location.href); alert("Website ची लिंक कॉपी झाली.");}
+}
+</script>
+</body>
+</html>
