@@ -33,9 +33,59 @@ button,.share{border:0;border-radius:14px;padding:13px 10px;font:inherit;font-we
 .footer{padding:16px;font-size:13px;color:#7c4037}
 .petals{font-size:24px;letter-spacing:7px}
 @media(max-width:380px){h1{font-size:32px}.buttons{grid-template-columns:1fr}.row{font-size:15px}}
+
+/* Ganpati opening screen */
+#openingScreen{
+  position:fixed;inset:0;z-index:9999;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at center,rgba(255,239,194,.95) 0 18%,transparent 44%),#fff8eb;
+  overflow:hidden;transition:opacity .8s ease,visibility .8s ease;
+}
+#openingScreen::before{
+  content:"";position:absolute;top:0;bottom:0;left:50%;width:8px;
+  transform:translateX(-50%);background:linear-gradient(to bottom,transparent 0 10%,#c99419 10% 90%,transparent 90%);
+  opacity:.9;
+}
+.opening-lines{
+  position:absolute;top:0;bottom:0;left:50%;width:180px;
+  transform:translateX(-50%);border-left:1px solid rgba(201,148,25,.22);
+  border-right:1px solid rgba(201,148,25,.22);
+}
+.opening-corner{position:absolute;width:32px;height:32px;border-color:rgba(201,148,25,.35);border-style:solid}
+.opening-corner.tl{top:28px;left:28px;border-width:2px 0 0 2px}
+.opening-corner.tr{top:28px;right:28px;border-width:2px 2px 0 0}
+.opening-corner.bl{bottom:28px;left:28px;border-width:0 0 2px 2px}
+.opening-corner.br{bottom:28px;right:28px;border-width:0 2px 2px 0}
+.opening-button{
+  position:relative;z-index:2;width:220px;height:220px;border-radius:50%;
+  border:2px dashed rgba(255,248,220,.85);
+  background:radial-gradient(circle at 35% 30%,#e6b93f,#b97900);
+  color:#fff8df;box-shadow:0 0 0 12px rgba(201,148,25,.08),0 18px 50px rgba(126,82,0,.28);
+  cursor:pointer;font-family:"Noto Sans Devanagari",sans-serif;font-size:21px;font-weight:700;
+  padding:20px;
+}
+.opening-button span{
+  display:block;margin-top:10px;font-family:Arial,sans-serif;font-size:12px;
+  letter-spacing:2px;font-weight:600;
+}
+#openingScreen.hide{opacity:0;visibility:hidden;pointer-events:none}
+
 </style>
 </head>
 <body>
+
+  <div id="openingScreen">
+    <div class="opening-lines"></div>
+    <div class="opening-corner tl"></div>
+    <div class="opening-corner tr"></div>
+    <div class="opening-corner bl"></div>
+    <div class="opening-corner br"></div>
+    <button class="opening-button" onclick="openWebsite()">
+      श्री गणेशाय नमः
+      <span>गणपती बाप्पा मोरया – TAP TO OPEN</span>
+    </button>
+  </div>
+
 <section class="hero">
   <div class="card">
     <div class="top">
@@ -71,38 +121,48 @@ button,.share{border:0;border-radius:14px;padding:13px 10px;font:inherit;font-we
 </section>
 
 <script>
-let ctx, master, timer, playing=false;
-const notes=[261.63,329.63,392,329.63,293.66,349.23,440,349.23];
-function playNote(freq,t){
-  const o=ctx.createOscillator(), g=ctx.createGain();
-  o.type="sine"; o.frequency.value=freq;
-  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(.045,t+.04);
-  g.gain.exponentialRampToValueAtTime(.001,t+.65);
-  o.connect(g).connect(master); o.start(t); o.stop(t+.7);
-}
-function loop(){
-  if(!playing)return;
-  const now=ctx.currentTime;
-  notes.forEach((n,i)=>playNote(n,now+i*.42));
-  timer=setTimeout(loop, notes.length*420);
-}
+
+let playing=false;
+const bgMusic=new Audio("Jai Ganesh Jai Ganesh Deva Instrumental.mp3");
+bgMusic.loop=true;
+bgMusic.preload="auto";
+bgMusic.volume=.75;
+
 function toggleMusic(){
   const b=document.getElementById("musicBtn");
   if(!playing){
-    ctx=new (window.AudioContext||window.webkitAudioContext)();
-    master=ctx.createGain(); master.gain.value=.8; master.connect(ctx.destination);
-    playing=true; b.textContent="🔇 संगीत बंद करा"; loop();
+    bgMusic.play().then(()=>{
+      playing=true;
+      if(b) b.textContent="🔇 संगीत बंद करा";
+    }).catch(()=>{});
   }else{
-    playing=false; clearTimeout(timer); if(ctx)ctx.close();
-    b.textContent="🎵 संगीत सुरू करा";
+    bgMusic.pause();
+    playing=false;
+    if(b) b.textContent="🎵 संगीत सुरू करा";
   }
 }
+
 async function sharePage(e){
   e.preventDefault();
   const data={title:"चावडीचा राजा",text:"चावडीचा राजा – भैरवनाथ गणेशोत्सव मंडळ, सोनके. गणपती बाप्पा मोरया! 🚩",url:location.href};
   if(navigator.share){try{await navigator.share(data)}catch(_){}}
   else{await navigator.clipboard.writeText(location.href); alert("Website ची लिंक कॉपी झाली.");}
 }
+
+function openWebsite(){
+  const screen=document.getElementById("openingScreen");
+  screen.classList.add("hide");
+  document.body.style.overflow="auto";
+  setTimeout(()=>screen.remove(),900);
+
+  // Start the existing website music only after the user's tap.
+  if(typeof toggleMusic==="function"){
+    setTimeout(()=>toggleMusic(),250);
+  }
+}
+
+document.body.style.overflow="hidden";
+
 </script>
 </body>
 </html>
